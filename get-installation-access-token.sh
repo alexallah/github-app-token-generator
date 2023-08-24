@@ -11,6 +11,7 @@ installation_id=$(echo "$response" | jq -r .id)
 
 if [ "$installation_id" = "null" ]; then
     echo "Unable to get installation ID. Is the GitHub App installed on ${repo}?"
+    echo $response
     echo "$response" | jq -r .message
     exit 1
 fi
