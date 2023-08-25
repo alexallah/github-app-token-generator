@@ -11,7 +11,7 @@ installation_id=$(echo "$response" | jq -r .id)
 
 if [ "$installation_id" = "null" ]; then
     echo "Unable to get installation ID. Is the GitHub App installed on ${repo}?"
-    echo $response
+    curl -s -H "Authorization: Bearer ${jwt}" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/app/installations"
     echo "$response" | jq -r .message
     exit 1
 fi
