@@ -9,9 +9,24 @@ jwt=$(ruby "$(dirname "$0")"/generate_jwt.rb)
 response=$(curl -s -H "Authorization: Bearer ${jwt}" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/${repo}/installation")
 installation_id=$(echo "$response" | jq -r .id)
 
+installation_id="32866860"
+token=$(curl -s -X POST \
+             -H "Authorization: Bearer ${jwt}" \
+             -H "Accept: application/vnd.github.v3+json" \
+             https://api.github.com/app/installations/"${installation_id}"/access_tokens | jq -r .token)
+
+curl -L \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $token" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  https://api.github.com/installation/repositories
+
+exit 1
+
+
 if [ "$installation_id" = "null" ]; then
     echo "Unable to get installation ID. Is the GitHub App installed on ${repo}?"
-    echo $response
+    curl -s -H "Authorization: Bearer ${jwt}" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/installation/repositories"
     echo "$response" | jq -r .message
     exit 1
 fi
